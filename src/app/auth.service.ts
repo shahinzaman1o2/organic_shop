@@ -4,7 +4,7 @@ import firebase from 'firebase/compat/app';
 import { Observable, of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from './user.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { AppUser } from './models/app-user';
 
 @Injectable({
@@ -28,11 +28,20 @@ export class AuthService {
   }
 
   logout() {
-    this.afAuth.signOut();
+    this.afAuth.signOut()
+      .then(() => {
+        // Clear the local storage
+        localStorage.removeItem('returnUrl');
+        location.reload(); // Reload the page to clear any remaining state
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   get appUser$(): Observable<AppUser | null> {
     return this.user$.pipe(
+      take(1),
       switchMap(user => {
         if (user) {
           return this.userService.get(user.uid);
