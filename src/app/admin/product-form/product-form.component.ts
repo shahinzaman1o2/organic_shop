@@ -14,6 +14,7 @@ export class ProductFormComponent implements OnInit {
 
   categories$!: Observable<any[]>;
   product: Product = {};
+  id: string | null = null;
 
   constructor(
     private db: AngularFireDatabase,
@@ -24,10 +25,10 @@ export class ProductFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      let id = params.get('id');
+      this.id = params.get('id');
       // console.log(params);
-      if (id) {
-        this.productService.get(id).subscribe(product => {
+      if (this.id) {
+        this.productService.get(this.id).subscribe(product => {
           if (product) {
             this.product = product;
           }
@@ -38,7 +39,9 @@ export class ProductFormComponent implements OnInit {
   }
 
   save(product: any) {
-    this.productService.create(product);
+    if (this.id) this.productService.update(this.id, product);
+    else this.productService.create(product);
+
     this.router.navigate(['/admin/products'])
   }
 }
