@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ProductService } from 'src/app/product.service';
 
 @Component({
@@ -6,22 +7,24 @@ import { ProductService } from 'src/app/product.service';
   templateUrl: './admin-products.component.html',
   styleUrls: ['./admin-products.component.css']
 })
-export class AdminProductsComponent {
-  products$;
+export class AdminProductsComponent implements OnDestroy {
+  products!: { title: string }[];
+  filteredProducts!: any[];
+  subscription: Subscription;
 
   constructor(private productService: ProductService) {
-    this.products$ = this.productService.getAll();
-
-    // console.log(this.products$);
-    // this.products$.subscribe(data => console.log(data));
-
-    // this.products$.subscribe(products => {
-    //   products.forEach(product => {
-    //     const key = product.key;
-    //     const data = product.payload ? product.payload.val() : null;
-    //     console.log(key, data);
-    //   });
-    // });
-
+    this.subscription = this.productService.getAll()
+      .subscribe(products => this.filteredProducts = this.products = products);
   }
+
+  filter(query: string) {
+    this.filteredProducts = (query) ?
+      this.products.filter(p => p.title.toLowerCase().includes(query.toLowerCase())) :
+      this.products;
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
 }
