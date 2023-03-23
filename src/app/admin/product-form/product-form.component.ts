@@ -1,30 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Observable, tap } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ProductService } from 'src/app/product.service';
 import { Product } from 'src/app/models/product';
+import { CategoryService } from 'src/app/category.service';
 
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.css']
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit, OnDestroy {
 
-  categories$!: Observable<any[]>;
+  categories$: Observable<any[]>;
   product: Product = {};
   id: string | null = null;
+  subscription!: Subscription;
 
   constructor(
-    private db: AngularFireDatabase,
     private productService: ProductService,
+    private categoryService: CategoryService,
     private router: Router,
-    private route: ActivatedRoute
-  ) { }
+    private route: ActivatedRoute,
+  ) {
+    this.categories$ = categoryService.getAll();
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.subscription = this.route.paramMap.subscribe(params => {
       this.id = params.get('id');
       // console.log(params);
       if (this.id) {
@@ -35,10 +38,9 @@ export class ProductFormComponent implements OnInit {
         });
       }
     });
-    this.categories$ = this.db.list('/categories').valueChanges();
   }
 
-  save(product: any) {
+  save(product: Product) {
     if (this.id) this.productService.update(this.id, product);
     else this.productService.create(product);
 
@@ -53,5 +55,9 @@ export class ProductFormComponent implements OnInit {
       this.router.navigate(['/admin/products']);
     }
   }
-}
 
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+}

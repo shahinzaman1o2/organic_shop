@@ -12,10 +12,7 @@ export class ProductService {
 
   create(product: any) {
     // console.log(product);
-    const categoryName = product.category; // extract the category name
-    // console.log(categoryName);
-    product.category = categoryName; // assign the category name to a new property on the product object
-    // console.log(categoryName);
+    // console.log(product.category);
     return this.db.list('/products').push(product);
   }
 

@@ -8,19 +8,31 @@ import { ProductService } from 'src/app/product.service';
   styleUrls: ['./admin-products.component.css']
 })
 export class AdminProductsComponent implements OnDestroy {
-  products!: { title: string }[];
+  products$: any[] = [];
   filteredProducts!: any[];
   subscription: Subscription;
 
   constructor(private productService: ProductService) {
     this.subscription = this.productService.getAll()
-      .subscribe(products => this.filteredProducts = this.products = products);
+      .subscribe((products: any[]) => {
+        this.filteredProducts = this.products$ = products;
+
+        // console.log(this.products$);
+        // this.products$.forEach((product: any) => {
+        //   console.log(product.key);
+        //   console.log(product.category);
+        //   console.log(product.imageUrl);
+        //   console.log(product.price);
+        //   console.log(product.title);
+        // });
+
+      });
   }
 
   filter(query: string) {
     this.filteredProducts = (query) ?
-      this.products.filter(p => p.title.toLowerCase().includes(query.toLowerCase())) :
-      this.products;
+      this.products$.filter((p: any) => p.title.toLowerCase().includes(query.toLowerCase())) :
+      this.products$;
   }
 
   ngOnDestroy() {
