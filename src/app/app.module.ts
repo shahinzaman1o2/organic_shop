@@ -28,7 +28,10 @@ import { ProductFormComponent } from './admin/product-form/product-form.componen
 import { CategoryService } from './category.service';
 import { ProductService } from './product.service';
 import { FormsModule } from '@angular/forms';
-import { CustomFormsModule } from 'ng2-validation';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -49,7 +52,9 @@ import { CustomFormsModule } from 'ng2-validation';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    CustomFormsModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
@@ -66,7 +71,8 @@ import { CustomFormsModule } from 'ng2-validation';
       { path: 'admin/products/:id', component: ProductFormComponent, canActivate: [AuthGuard, AdminAuthGuard] },
       { path: 'admin/products', component: AdminProductsComponent, canActivate: [AuthGuard, AdminAuthGuard] },
       { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [AuthGuard, AdminAuthGuard] },
-    ])
+    ]),
+    BrowserAnimationsModule
   ],
   providers: [
     AuthService,
